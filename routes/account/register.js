@@ -5,7 +5,7 @@ var responseApi = require('../../response/api-response');
 var responseCode = require('../../response/response-codes');
 var responseMessage = require('../../response/response-messages');
 let API = process.env.API_PREFIX;
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 router.post(`${API}register`, function (req, res, next) {
     console.log(req.body);
