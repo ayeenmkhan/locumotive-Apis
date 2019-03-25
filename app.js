@@ -14,8 +14,8 @@ app.use(validator());
  */
 var account = require('./routes/account/register');
 var login = require('./routes/account/login');
-var adminLogin = require('./routes/account/admin-login');
-var admin = require('./routes/admin/admin');
+// var adminLogin = require('./routes/account/admin-login');
+// var admin = require('./routes/admin/admin');
 var user = require('./routes/locom/users');
 var dashboard = require('./routes/locom/dashboard');
 var storeJob = require('./routes/store/job-feeds');
@@ -40,8 +40,8 @@ app.use(dashboard);
 app.use(storeJob);
 app.use(user);
 app.use(storeSetting);
-app.use(adminLogin);
-app.use(admin);
+// app.use(adminLogin);
+// app.use(admin);
  /**
    * Validations For Requests
    */
