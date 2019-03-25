@@ -3,7 +3,7 @@ const Op = require('sequelize').Op;
 var responseApi = require('../../response/api-response');
 var responseCode = require('../../response/response-codes');
 var responseMessage = require('../../response/response-messages');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 function loginRequest(email, password) {
 
