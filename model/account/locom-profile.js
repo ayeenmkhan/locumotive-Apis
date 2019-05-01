@@ -15,8 +15,13 @@ let User = Sqlconfig.define('locom_profiles', {
     insurance_company: Sequelize.TEXT,
     insurance_no: Sequelize.TEXT,
     profile_photo: Sequelize.TEXT,
+    goc_proof: Sequelize.TEXT,
+    insurance_proof: Sequelize.TEXT,
+    opl_proof: Sequelize.TEXT,
     equipment_preferred: Sequelize.TEXT,
     skills: Sequelize.TEXT,
+    latitude: Sequelize.STRING,
+    longitude: Sequelize.STRING,
     year_of_experience: Sequelize.TEXT,
     preferred_testing_time: Sequelize.TEXT,
 }, {

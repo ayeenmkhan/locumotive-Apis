@@ -11,6 +11,7 @@ let User = Sqlconfig.define('job_preferences', {
     start_date: Sequelize.DATE,
     end_date: Sequelize.DATE,
     country: Sequelize.TEXT,
+    county: Sequelize.TEXT,
     distance: Sequelize.TEXT,
     testing_time: Sequelize.TEXT,
     min_weekday_amount: Sequelize.TEXT,

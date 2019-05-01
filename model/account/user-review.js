@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const Sqlconfig = require('../../sequelize/config');
-
-let User = Sqlconfig.define('locom_reviews', {
+const user = require('../account/user');
+let review = Sqlconfig.define('locom_reviews', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -20,5 +20,5 @@ let User = Sqlconfig.define('locom_reviews', {
     paranoid: false,
     timestamps: false
 });
-
-module.exports = User;
+// user.hasMany(review, { foreignKey: 'user_id' });
+module.exports = review;

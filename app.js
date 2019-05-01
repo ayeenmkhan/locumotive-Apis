@@ -12,7 +12,11 @@ app.use(validator());
 /**
  * Routes
  */
+try{
 var account = require('./routes/account/register');
+}catch(err){
+  console.log(err);
+}
 var login = require('./routes/account/login');
 // var adminLogin = require('./routes/account/admin-login');
 // var admin = require('./routes/admin/admin');

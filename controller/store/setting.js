@@ -8,7 +8,7 @@ var responseMessage = require('../../response/response-messages');
 var responseApi = require('../../response/api-response');
 var nodemailer = require('../../node_modules/nodemailer');
 let Op = seqluize.Op;
-
+var notification =require('../../model/locom/notifications');
 
 
 function updateStoreProfile(userData) {
@@ -25,7 +25,7 @@ function updateStoreProfile(userData) {
             })
             .catch(err => {
                 console.log(err);
-                reject(responseApi.response(responseCode.DB_ERROR, responseMessage.DB_ERROR))
+                reject(responseApi.error(responseCode.DB_ERROR, responseMessage.DB_ERROR))
             })
 
     })
@@ -53,12 +53,12 @@ function getStoreProfile(storeData) {
                         resolve(profileData);
                     })
                     .catch((erorr) => {
-                        reject(erorr);
+                        reject(responseApi.error(responseCode.DB_ERROR, responseMessage.DB_ERROR))
                     })
             })
             .catch(err => {
                 console.log(err);
-                reject(responseApi.response(responseCode.DB_ERROR, responseMessage.DB_ERROR))
+                reject(responseApi.error(responseCode.DB_ERROR, responseMessage.DB_ERROR));
             })
 
     })
@@ -80,7 +80,31 @@ function getAllStores() {
             })
             .catch(err => {
                 console.log(err);
-                reject(responseApi.response(responseCode.DB_ERROR, responseMessage.DB_ERROR))
+                reject(responseApi.error(responseCode.DB_ERROR, responseMessage.DB_ERROR))
+            })
+
+    })
+}
+/**
+ * 
+ * @param {*} Get all list of Notifications By ID 
+ */
+function getNotifications(user_id) {
+
+    return new Promise((resolve, reject) => {
+        notification.findAll({
+            where:{
+                reciepents: user_id
+            },
+                raw: true
+            })
+            .then(storeData => {
+                resolve(storeData);
+
+            })
+            .catch(err => {
+                console.log(err);
+                reject(responseApi.error(responseCode.DB_ERROR, responseMessage.DB_ERROR))
             })
 
     })
@@ -88,5 +112,6 @@ function getAllStores() {
 module.exports = {
     updateStoreProfile,
     getStoreProfile,
-    getAllStores
+    getAllStores,
+    getNotifications
 }

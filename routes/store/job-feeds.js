@@ -6,12 +6,12 @@ let API = process.env.API_PREFIX;
 var responseApi = require('../../response/api-response');
 var responseCode = require('../../response/response-codes');
 var responseMessage = require('../../response/response-messages');
-
+var tokenMiddleware = require('../../middleware/authentication/jwt');
 
 /**
  * Add  new jobs feed data
  */
-router.post(`${API}jobs`, function (req, res, next) {
+router.post(`${API}jobs`,tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
@@ -36,21 +36,26 @@ router.post(`${API}jobs`, function (req, res, next) {
         field_test: queryParameters.field_test,
         phorotoper: queryParameters.phorotoper,
         trail_frame: queryParameters.trail_frame,
+        contact_lens: queryParameters.contact_lens,
     }
     //console.log(jobData);
     storeJobs.addJob(jobData)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response={
+                "status":responseCode.OK,
+                "data":jobFeeds
+            }
+            res.json(response);
         })
         .catch((err) => {
-            console.log(err);
+            // console.log(err);
             res.json(err);
         });
 });
 /**
  * get news jobs feed data store
  */
-router.get(`${API}store-jobs`, function (req, res, next) {
+router.get(`${API}store-jobs`,tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.query;
     let storeInfo ={
@@ -58,7 +63,11 @@ router.get(`${API}store-jobs`, function (req, res, next) {
     }
     storeJobs.jobsFeed(storeInfo)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response={
+                "status":responseCode.OK,
+                "data":jobFeeds
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -77,7 +86,80 @@ router.get(`${API}applicants`, function (req, res, next) {
     }
     storeJobs.jobsApplicant(storeInfo)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response={
+                "status":responseCode.OK,
+                "data":jobFeeds
+            }
+            res.json(response);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.json(err);
+        });
+});
+/**
+ * Approve job applicant 
+ */
+router.post(`${API}approved`,tokenMiddleware, function (req, res, next) {
+
+    let info ={
+        job_id:req.body.job_id,
+        user_id:req.body.user_id,
+        status:req.body.status,
+    }
+    storeJobs.approvedJob(info)
+        .then((jobFeeds) => {
+            res.json(jobFeeds);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.json(err);
+        });
+});
+
+/**
+ * Get Booked/approved jobs for Store 
+ */
+router.get(`${API}store-booked-jobs/:id`,tokenMiddleware, function (req, res, next) {
+
+    let store_id = req.params.id;
+// console.log(queryParameters.store_id)
+    let jobPref = {
+        store_id: store_id,
+    }
+    storeJobs.jobBooked(jobPref)
+        .then((jobFeeds) => {
+            // console.log("booked jobs",jobFeeds);
+           
+            let response={
+                status:responseCode.OK,
+                data:jobFeeds,
+            }
+            res.json(response);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.json(err);
+        });
+});
+/**
+ * Get Booked/approved jobs for Store 
+ */
+router.get(`${API}store-completed-jobs/:id`,tokenMiddleware, function (req, res, next) {
+
+    let store_id = req.params.id;
+// console.log(queryParameters.store_id)
+    let jobPref = {
+        store_id: store_id,
+    }
+    storeJobs.jobCompleted(jobPref)
+        .then((jobFeeds) => {
+            // console.log("booked jobs",jobFeeds);
+            let response={
+                status:responseCode.OK,
+                data:jobFeeds,
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -87,12 +169,16 @@ router.get(`${API}applicants`, function (req, res, next) {
 /**
  * Get job Details against ID
  */
-router.get(`${API}job-detail/:id`, function (req, res, next) {
+router.get(`${API}store-job-detail/:id`,tokenMiddleware, function (req, res, next) {
 
     let job_id = req.params.id;
-    locomJobs.jobDetail(job_id)
+    storeJobs.jobDetail(job_id)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response={
+                "status":responseCode.OK,
+                "data":jobFeeds
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -102,7 +188,7 @@ router.get(`${API}job-detail/:id`, function (req, res, next) {
 /**
  * Set preferences
  */
-router.post(`${API}preferences`, function (req, res, next) {
+router.post(`${API}preferences`,tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
@@ -129,7 +215,7 @@ router.post(`${API}preferences`, function (req, res, next) {
 /**
  * Get preferences 
  */
-router.get(`${API}preferences`, function (req, res, next) {
+router.get(`${API}preferences`,tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 

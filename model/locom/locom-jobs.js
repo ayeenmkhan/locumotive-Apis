@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 const Sqlconfig = require('../../sequelize/config');
-let store =require('../../model/account/store-profile');
+let applicant =require('../../model/locom/job-apply');
 
 let Job = Sqlconfig.define('locom_jobs', {
     id: {
@@ -30,13 +30,14 @@ let Job = Sqlconfig.define('locom_jobs', {
     field_test: Sequelize.INTEGER,
     phorotoper: Sequelize.INTEGER,
     trail_frame: Sequelize.INTEGER,
+    contact_lens: Sequelize.INTEGER,
     store_id: Sequelize.INTEGER,
     intrested: Sequelize.TEXT,
 }, {
     paranoid: false,
     timestamps: false
 });
-// Job.belongsTo(store, { foreignKey: 'id',targetKey:'id' });
+// applicant.belongsTo(Job, { foreignKey: 'job_id'});
 
 
 module.exports = Job;

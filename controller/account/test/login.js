@@ -34,8 +34,9 @@ function loginRequest(email, password) {
                                 },
                             })
                             .then((logging)=>{
-                                // console.log(loging);
+                                //  console.log("loging result is",logging);
                                 user.store_id=logging.id;
+                                console.log("USER DATA IS ",user)
                                 resolve(user);
                             })
                             .catch((err)=>{

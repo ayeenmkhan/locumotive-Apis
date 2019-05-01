@@ -6,42 +6,70 @@ let API = process.env.API_PREFIX;
 var responseApi = require('../../response/api-response');
 var responseCode = require('../../response/response-codes');
 var responseMessage = require('../../response/response-messages');
-
+let tokenMiddleware = require('../../middleware/authentication/jwt');
 /**
  * get news jobs feed data
  */
-router.get(`${API}jobs`, function (req, res, next) {
+router.get(`${API}jobs`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.query;
 
     let jobPref = {
         user_id: queryParameters.user_id,
-        start_date: queryParameters.start_date,
-        end_date: queryParameters.end_date,
-        country: queryParameters.country,
-        distance: queryParameters.distance,
-        testing_time: queryParameters.testing_time,
-        min_weekday_amount: queryParameters.min_weekday_amount,
-        min_weekend_amount: queryParameters.min_weekend_amount,
     }
-    locomJobs.jobs(jobPref)
+    // console.log("jobbbbb",jobPref);
+    locomJobs.getPreferences(jobPref)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            if (jobFeeds == null || jobFeeds == '') {
+                // console.log("Null feeds data is", jobFeeds);
+                locomJobs.jobsNotPref(jobPref)
+                    .then((jobFeed) => {
+                        let response = {
+                            "status": responseCode.OK,
+                            "data": jobFeed
+                        }
+                        res.json(response);
+                    })
+                    .catch((err) => {
+                        // console.log(err);
+                        res.json(err);
+                    })
+            } else {
+                // console.log("Jobs fedd data is", jobFeeds);
+                locomJobs.jobs(jobFeeds)
+                    .then((jobFeeds) => {
+                        let response = {
+                            "status": responseCode.OK,
+                            "data": jobFeeds
+                        }
+                        res.json(response);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        res.json(err);
+                    });
+            }
+            // res.json(responseApi.response(responseCode.OK, jobFeeds));
         })
         .catch((err) => {
             console.log(err);
             res.json(err);
         });
+
 });
 /**
  * Get job Details against ID
  */
-router.get(`${API}job-detail/:id`, function (req, res, next) {
+router.get(`${API}job-detail/:id`, tokenMiddleware, function (req, res, next) {
 
     let job_id = req.params.id;
     locomJobs.jobDetail(job_id)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response={
+                "status":responseCode.OK,
+                "data":jobFeeds
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -51,7 +79,7 @@ router.get(`${API}job-detail/:id`, function (req, res, next) {
 /**
  * Set preferences
  */
-router.post(`${API}preferences`, function (req, res, next) {
+router.post(`${API}preferences`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
@@ -59,7 +87,8 @@ router.post(`${API}preferences`, function (req, res, next) {
         user_id: queryParameters.user_id,
         start_date: queryParameters.start_date,
         end_date: queryParameters.end_date,
-        country: queryParameters.country,
+        // country: queryParameters.country,
+        county: queryParameters.county,
         distance: queryParameters.distance,
         testing_time: queryParameters.testing_time,
         min_weekday_amount: queryParameters.min_weekday_amount,
@@ -67,7 +96,13 @@ router.post(`${API}preferences`, function (req, res, next) {
     }
     locomJobs.setPreferences(jobPref)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response = {
+                status: responseCode.OK,
+                data: {
+                    messages: jobFeeds,
+                }
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -78,7 +113,7 @@ router.post(`${API}preferences`, function (req, res, next) {
 /**
  * Get preferences 
  */
-router.get(`${API}preferences`, function (req, res, next) {
+router.get(`${API}preferences`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
@@ -97,17 +132,24 @@ router.get(`${API}preferences`, function (req, res, next) {
 /**
  * Apply for job 
  */
-router.post(`${API}apply`, function (req, res, next) {
+router.post(`${API}apply`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
     let jobPref = {
         user_id: queryParameters.user_id,
         job_id: queryParameters.job_id,
+        store_id: queryParameters.store_id,
     }
     locomJobs.jobApply(jobPref)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response = {
+                status: responseCode.OK,
+                data: {
+                    messages: "Applied for job Successfuly"
+                }
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -118,14 +160,14 @@ router.post(`${API}apply`, function (req, res, next) {
 /**
  * Reject Applied job 
  */
-router.post(`${API}reject`, function (req, res, next) {
+router.post(`${API}reject`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
     let jobPref = {
         user_id: queryParameters.user_id,
         job_id: queryParameters.job_id,
-        status: queryParameters.status,
+        status: 3,
     }
     locomJobs.jobApply(jobPref)
         .then((jobFeeds) => {
@@ -140,7 +182,7 @@ router.post(`${API}reject`, function (req, res, next) {
 /**
  * Get pending jobs for job 
  */
-router.get(`${API}pending-jobs`, function (req, res, next) {
+router.get(`${API}pending-jobs`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.query;
 
@@ -148,8 +190,12 @@ router.get(`${API}pending-jobs`, function (req, res, next) {
         user_id: queryParameters.user_id,
     }
     locomJobs.jobPending(jobPref)
-        .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+        .then((jobsList) => {
+            let response = {
+                "status": responseCode.OK,
+                "data": jobsList,
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -159,7 +205,7 @@ router.get(`${API}pending-jobs`, function (req, res, next) {
 /**
  * Get Booked/approved jobs for locom 
  */
-router.get(`${API}booked-jobs`, function (req, res, next) {
+router.get(`${API}booked-jobs`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.query;
 
@@ -168,7 +214,12 @@ router.get(`${API}booked-jobs`, function (req, res, next) {
     }
     locomJobs.jobBooked(jobPref)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            console.log("booked jobs", jobFeeds);
+            let response = {
+                "status": responseCode.OK,
+                "data": jobFeeds,
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -177,15 +228,16 @@ router.get(`${API}booked-jobs`, function (req, res, next) {
 });
 
 /**
- * Get Booked/approved jobs for locom 
+ * Cancel job offer by locum
  */
-router.delete(`${API}reject-jobs`, function (req, res, next) {
+router.delete(`${API}reject-jobs`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
     let jobPref = {
         user_id: queryParameters.user_id,
         job_id: queryParameters.job_id,
+        store_id: queryParameters.store_id,
     }
     locomJobs.jobRejeted(jobPref)
         .then((jobFeeds) => {
@@ -200,7 +252,7 @@ router.delete(`${API}reject-jobs`, function (req, res, next) {
 /**
  * Get WorkHistory/Completed Jobs for locom 
  */
-router.get(`${API}completed-jobs`, function (req, res, next) {
+router.get(`${API}completed-jobs`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.query;
 
@@ -210,7 +262,11 @@ router.get(`${API}completed-jobs`, function (req, res, next) {
     }
     locomJobs.jobCompleted(jobPref)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response = {
+                "status": responseCode.OK,
+                "data": jobFeeds
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -221,7 +277,7 @@ router.get(`${API}completed-jobs`, function (req, res, next) {
 /**
  * Cancel Job offer by locom 
  */
-router.post(`${API}cancel-offer`, function (req, res, next) {
+router.post(`${API}cancel-offer`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.body;
 
@@ -233,7 +289,13 @@ router.post(`${API}cancel-offer`, function (req, res, next) {
     }
     locomJobs.jobOfferCancel(cancelOffer)
         .then((jobFeeds) => {
-            res.json(responseApi.response(responseCode.OK, jobFeeds));
+            let response = {
+                status: responseCode.OK,
+                data: {
+                    messages: jobFeeds
+                }
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);
@@ -244,7 +306,7 @@ router.post(`${API}cancel-offer`, function (req, res, next) {
 /**
  * user/locom payment history 
  */
-router.get(`${API}payment-history`, function (req, res, next) {
+router.get(`${API}payment-history`, tokenMiddleware, function (req, res, next) {
 
     let queryParameters = req.query;
     let user = {
@@ -252,7 +314,11 @@ router.get(`${API}payment-history`, function (req, res, next) {
     }
     locomJobs.getPaymentHistory(user)
         .then((jobData) => {
-            res.json(responseApi.response(responseCode.OK, jobData));
+            let response={
+                "status":responseCode.OK,
+                "data":jobData
+            }
+            res.json(response);
         })
         .catch((err) => {
             console.log(err);

@@ -30,7 +30,7 @@ let responseMessages = {
     DB_ERROR: 'Database error occured',
 
     UNKNOWN: 'Unknown error occured',
-    UNAUTHORIZED: 'User not authorized',
+    UNAUTHORIZED: 'User not authorized /Token Is Required Or May Be Expired',
     SERVER_ERROR: 'Internal server error'
 
 };

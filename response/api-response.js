@@ -4,7 +4,7 @@ let apiResponseMessages = require('../response/response-messages');
 function successResponse(code, message) {
     return {
         status: code,
-        data: message
+        data: {}
     }
 }
 function errorResponse(code, message) {
