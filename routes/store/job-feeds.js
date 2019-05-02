@@ -20,6 +20,7 @@ router.post(`${API}jobs`,tokenMiddleware, function (req, res, next) {
         end_date: queryParameters.end_date,
         job_title: queryParameters.job_title,
         country: queryParameters.country,
+        county: queryParameters.county,
         distance: queryParameters.distance,
         testing_time: queryParameters.testing_time,
         store_id: queryParameters.store_id,

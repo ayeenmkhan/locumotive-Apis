@@ -11,6 +11,7 @@ let Job = Sqlconfig.define('locom_jobs', {
     job_title: Sequelize.TEXT,
     job_id: Sequelize.TEXT,
     country: Sequelize.TEXT,
+    county: Sequelize.TEXT,
     city: Sequelize.TEXT,
     distance: Sequelize.TEXT,
     start_date: Sequelize.DATE,
